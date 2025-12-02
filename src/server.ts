@@ -5,6 +5,7 @@ import path from "path";
 
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 const app = express();
+const port = 5000;
 
 app.use(express.json());
 
@@ -44,12 +45,25 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World, i am learning express.js on details !");
 });
 
-app.post("/", (req, res) => {
-  console.log(req.body);
-  res.status(201).json({
-    status: true,
-    message: "API is working",
-  });
+app.post("/users", async (req: Request, res: Response) => {
+  const { name, email } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO users(name, email) VALUES($1, $2) RETURNING *`,
+      [name, email]
+    );
+    res.status(201).json({
+      success: false,
+      message: "Data inserted successfully",
+      data: result.rows[0],
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 });
 
 app.listen(port, () => {
