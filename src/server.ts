@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { Pool } from "pg";
 import dotenv from "dotenv";
 import path from "path";
@@ -41,7 +41,12 @@ const initDB = async () => {
 };
 initDB();
 
-app.get("/", (req: Request, res: Response) => {
+const logger = (req: Request, res: Response, next: NextFunction) => {
+  console.log(`[${new Date().toISOString}] ${req.method} ${req.path}`);
+  next();
+};
+
+app.get("/", logger, (req: Request, res: Response) => {
   res.send("Hello World, i am learning express.js on details !");
 });
 
@@ -274,6 +279,15 @@ app.delete("/todos/:id", async (req: Request, res: Response) => {
     });
   }
 });
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route is not found",
+    path: req.path,
+  });
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
