@@ -222,6 +222,32 @@ app.get("/todos/:id", async (req: Request, res: Response) => {
   }
 });
 
+app.put("/todos/:id", async (req: Request, res: Response) => {
+  const { title, completed } = req.body;
+  try {
+    const result = await pool.query(
+      `UPDATE todos SET title=$1, completed=$2 WHERE id=$3 RETURNING *`,
+      [title, completed, req.params.id]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "todos not found",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "todos updated successfully",
+        data: result.rows[0],
+      });
+    }
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: "failed to update todos",
+    });
+  }
+});
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
