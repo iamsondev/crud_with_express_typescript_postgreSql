@@ -1,6 +1,8 @@
 import express, { NextFunction, Request, Response } from "express";
-import initDB from "./config/db";
+import initDB, { pool } from "./config/db";
 import config from "./config";
+import logger from "./middleware/logger";
+import { userRouter } from "./modules/user/user.route";
 
 const app = express();
 const port = config.port;
@@ -9,52 +11,29 @@ app.use(express.json());
 
 initDB();
 
-const logger = (req: Request, res: Response, next: NextFunction) => {
-  console.log(`[${new Date().toISOString}] ${req.method} ${req.path}`);
-  next();
-};
-
+// this is get is for localhost:5000/
 app.get("/", logger, (req: Request, res: Response) => {
   res.send("Hello World, i am learning express.js on details !");
 });
 
-app.post("/users", async (req: Request, res: Response) => {
-  const { name, email } = req.body;
+app.use("/users", userRouter);
 
-  try {
-    const result = await pool.query(
-      `INSERT INTO users(name, email) VALUES($1, $2) RETURNING *`,
-      [name, email]
-    );
-    res.status(201).json({
-      success: false,
-      message: "Data inserted successfully",
-      data: result.rows[0],
-    });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-});
-
-app.get("/users", async (req: Request, res: Response) => {
-  try {
-    const result = await pool.query(`SELECT * FROM users `);
-    res.status(200).json({
-      success: true,
-      message: "users retrieved successfully",
-      data: result.rows,
-    });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-      details: err,
-    });
-  }
-});
+// app.get("/users", async (req: Request, res: Response) => {
+//   try {
+//     const result = await pool.query(`SELECT * FROM users `);
+//     res.status(200).json({
+//       success: true,
+//       message: "users retrieved successfully",
+//       data: result.rows,
+//     });
+//   } catch (err: any) {
+//     res.status(500).json({
+//       success: false,
+//       message: err.message,
+//       details: err,
+//     });
+//   }
+// });
 
 app.get("/users/:id", async (req: Request, res: Response) => {
   try {
