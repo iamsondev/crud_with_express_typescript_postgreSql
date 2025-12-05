@@ -22,6 +22,9 @@ app.use("/users", userRouter);
 // Todos crud
 app.use("/todos", todoRouter);
 
+// auth
+app.use("/auth");
+
 app.use((req, res) => {
   res.status(404).json({
     success: false,
