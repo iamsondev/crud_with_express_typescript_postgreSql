@@ -9,6 +9,28 @@ const createTodo = async (payload: Record<string, unknown>) => {
   return result;
 };
 
+const getTodos = async () => {
+  const result = await pool.query(`SELECT * FROM todos`);
+  return result;
+};
+
+const getSingleTodo = async (id: string) => {
+  const result = await pool.query(`SELECT * FROM todos WHERE id = $1`, [id]);
+  return result;
+};
+
+const updateTodo = async (payload: Record<string, unknown>, id: string) => {
+  const { title, completed } = payload;
+  const result = await pool.query(
+    `UPDATE todos SET title=$1, completed=$2 WHERE id=$3 RETURNING *`,
+    [title, completed, id]
+  );
+  return result;
+};
+
 export const todoService = {
   createTodo,
+  getTodos,
+  getSingleTodo,
+  updateTodo,
 };

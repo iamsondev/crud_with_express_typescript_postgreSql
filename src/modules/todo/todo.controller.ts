@@ -17,6 +17,71 @@ const createTodo = async (req: Request, res: Response) => {
   }
 };
 
+const getTodos = async (req: Request, res: Response) => {
+  try {
+    const result = await todoService.getTodos();
+    res.status(200).json({
+      success: true,
+      message: "todos retrieved successfully",
+      data: result.rows,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+const getSingleTodo = async (req: Request, res: Response) => {
+  try {
+    const result = await todoService.getSingleTodo(req.params.id!);
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "todos not found",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "todos fetched successfully",
+        data: result.rows[0],
+      });
+    }
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+const updateTodo = async (req: Request, res: Response) => {
+  try {
+    const result = await todoService.updateTodo(req.body, req.params.id!);
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "todos not found",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "todos updated successfully",
+        data: result.rows[0],
+      });
+    }
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: "failed to update todos",
+    });
+  }
+};
+
 export const todoController = {
   createTodo,
+  getTodos,
+  getSingleTodo,
+  updateTodo,
 };
