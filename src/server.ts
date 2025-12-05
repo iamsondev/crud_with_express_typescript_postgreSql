@@ -22,32 +22,6 @@ app.use("/users", userRouter);
 // Todos crud
 app.use("/todos", todoRouter);
 
-app.delete("/todos/:id", async (req: Request, res: Response) => {
-  try {
-    const result = await pool.query(
-      `DELETE FROM todos WHERE id=$1 RETURNING *`,
-      [req.params.id]
-    );
-    if (result.rowCount === 0) {
-      res.status(404).json({
-        success: false,
-        message: "todos not found",
-      });
-    } else {
-      res.status(200).json({
-        success: true,
-        message: "todos deleted successfully",
-        data: null,
-      });
-    }
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-});
-
 app.use((req, res) => {
   res.status(404).json({
     success: false,
