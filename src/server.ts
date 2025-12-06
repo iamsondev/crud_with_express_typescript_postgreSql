@@ -4,6 +4,7 @@ import config from "./config";
 import logger from "./middleware/logger";
 import { userRouter } from "./modules/user/user.route";
 import { todoRouter } from "./modules/todo/todo.router";
+import { authRouter } from "./modules/auth/auth.router";
 
 const app = express();
 const port = config.port;
@@ -23,7 +24,7 @@ app.use("/users", userRouter);
 app.use("/todos", todoRouter);
 
 // auth
-app.use("/auth");
+app.use("/auth", authRouter);
 
 app.use((req, res) => {
   res.status(404).json({
